@@ -71,10 +71,7 @@ export default function AdminMenuPage() {
     }
 
     const saveCat = async () => {
-        if (!catName.trim()) {
-            toast.error('Category name is required')
-            return
-        }
+        if (!catName.trim()) { toast.error('Category name is required'); return }
         const payload = { name: catName.trim(), sort_order: catOrder }
         if (editingCat) {
             const { error } = await supabase.from('categories').update(payload).eq('id', editingCat.id)
@@ -117,10 +114,7 @@ export default function AdminMenuPage() {
     }
 
     const saveItem = async () => {
-        if (!itemName.trim() || !itemPrice) {
-            toast.error('Name and price are required')
-            return
-        }
+        if (!itemName.trim() || !itemPrice) { toast.error('Name and price are required'); return }
         const payload = {
             name: itemName.trim(),
             description: itemDesc.trim(),
@@ -156,66 +150,73 @@ export default function AdminMenuPage() {
     }
 
     return (
-        <div className="p-6">
-            <div className="flex items-center justify-between mb-8 animate-fade-in-up">
-                <div>
-                    <h1 className="text-2xl font-extrabold text-stone-100">Menu Management</h1>
-                    <p className="text-stone-500 text-sm mt-1">Manage categories and menu items</p>
+        <div className="p-4 sm:p-6">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-6 sm:mb-8 animate-fade-in-up gap-3">
+                <div className="min-w-0">
+                    <h1 className="text-xl sm:text-2xl font-extrabold text-stone-100">Menu Management</h1>
+                    <p className="text-stone-500 text-xs sm:text-sm mt-1">Manage categories and menu items</p>
                 </div>
-                <button onClick={() => openCatForm()} className="btn-primary flex items-center gap-2 text-sm">
-                    <Plus size={16} />
-                    Add Category
+                <button
+                    onClick={() => openCatForm()}
+                    className="btn-primary flex items-center gap-1.5 text-xs sm:text-sm shrink-0 px-3 py-2 sm:px-4"
+                >
+                    <Plus size={15} />
+                    <span className="hidden xs:inline">Add Category</span>
+                    <span className="xs:hidden">Add</span>
                 </button>
             </div>
 
             {loading ? (
                 <div className="space-y-4">
-                    {[...Array(3)].map((_, i) => <div key={i} className="h-20 shimmer" />)}
+                    {[...Array(3)].map((_, i) => <div key={i} className="h-20 shimmer rounded-xl" />)}
                 </div>
             ) : categories.length === 0 ? (
-                <div className="text-center py-20 text-stone-600">
-                    <Layers size={48} className="mx-auto mb-3 opacity-30" />
-                    <p>No categories yet. Add your first category to get started.</p>
+                <div className="text-center py-16 sm:py-20 text-stone-600">
+                    <Layers size={44} className="mx-auto mb-3 opacity-30" />
+                    <p className="text-sm">No categories yet. Add your first category to get started.</p>
                 </div>
             ) : (
                 <div className="space-y-3 stagger-children">
                     {categories.map((cat) => (
                         <div key={cat.id} className="glass-card overflow-hidden">
                             {/* Category Header */}
-                            <div className="flex items-center justify-between p-4 cursor-pointer"
+                            <div
+                                className="flex items-center justify-between p-3 sm:p-4 cursor-pointer"
                                 onClick={() => setExpandedCat(expandedCat === cat.id ? null : cat.id)}
                             >
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                                <div className="flex items-center gap-3 min-w-0">
+                                    <div
+                                        className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shrink-0"
                                         style={{ background: 'linear-gradient(135deg, rgba(245,158,11,0.2), rgba(217,119,6,0.1))' }}
                                     >
-                                        <Layers size={18} className="text-amber-500" />
+                                        <Layers size={16} className="text-amber-500" />
                                     </div>
-                                    <div>
-                                        <h3 className="font-bold text-stone-100">{cat.name}</h3>
+                                    <div className="min-w-0">
+                                        <h3 className="font-bold text-stone-100 text-sm sm:text-base truncate">{cat.name}</h3>
                                         <p className="text-stone-500 text-xs">{cat.menu_items?.length || 0} items</p>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-2">
+
+                                <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
                                     <button
                                         onClick={(e) => { e.stopPropagation(); openCatForm(cat) }}
-                                        className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-stone-700 transition-all"
+                                        className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center hover:bg-stone-700 transition-all"
                                         style={{ border: '1px solid rgba(255,255,255,0.08)' }}
                                     >
-                                        <Pencil size={14} className="text-stone-400" />
+                                        <Pencil size={12} className="text-stone-400" />
                                     </button>
                                     <button
                                         onClick={(e) => { e.stopPropagation(); deleteCat(cat.id) }}
-                                        className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-red-900/30 transition-all"
+                                        className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center hover:bg-red-900/30 transition-all"
                                         style={{ border: '1px solid rgba(239,68,68,0.2)' }}
                                     >
-                                        <Trash2 size={14} className="text-red-400" />
+                                        <Trash2 size={12} className="text-red-400" />
                                     </button>
-                                    {expandedCat === cat.id ? (
-                                        <ChevronUp size={18} className="text-stone-500" />
-                                    ) : (
-                                        <ChevronDown size={18} className="text-stone-500" />
-                                    )}
+                                    {expandedCat === cat.id
+                                        ? <ChevronUp size={16} className="text-stone-500" />
+                                        : <ChevronDown size={16} className="text-stone-500" />
+                                    }
                                 </div>
                             </div>
 
@@ -227,50 +228,70 @@ export default function AdminMenuPage() {
                                             No items in this category yet
                                         </div>
                                     )}
+
                                     {cat.menu_items?.map((item) => (
-                                        <div key={item.id} className="flex items-center gap-4 px-4 py-3 transition-all hover:bg-white/[0.02]"
+                                        <div
+                                            key={item.id}
+                                            className="flex items-center gap-3 px-3 sm:px-4 py-3 transition-all hover:bg-white/[0.02]"
                                             style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}
                                         >
+                                            {/* Thumbnail */}
                                             {item.image_url ? (
-                                                <img src={item.image_url} alt={item.name} className="w-12 h-12 rounded-lg object-cover flex-shrink-0" />
+                                                <img
+                                                    src={item.image_url}
+                                                    alt={item.name}
+                                                    className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg object-cover shrink-0"
+                                                />
                                             ) : (
-                                                <div className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0"
-                                                    style={{ background: 'rgba(255,255,255,0.05)' }}>
-                                                    <Image size={16} className="text-stone-600" />
+                                                <div
+                                                    className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center shrink-0"
+                                                    style={{ background: 'rgba(255,255,255,0.05)' }}
+                                                >
+                                                    <Image size={14} className="text-stone-600" />
                                                 </div>
                                             )}
+
+                                            {/* Name + description */}
                                             <div className="flex-1 min-w-0">
                                                 <h4 className="font-medium text-stone-200 text-sm truncate">{item.name}</h4>
-                                                <p className="text-stone-500 text-xs truncate">{item.description}</p>
+                                                <p className="text-stone-500 text-xs truncate hidden sm:block">{item.description}</p>
                                             </div>
-                                            <span className="font-bold text-amber-500 text-sm whitespace-nowrap">₹{item.price}</span>
-                                            <button
-                                                onClick={() => toggleAvailability(item)}
-                                                className="transition-all"
-                                                title={item.available ? 'Available' : 'Unavailable'}
-                                            >
-                                                {item.available ? (
-                                                    <ToggleRight size={24} style={{ color: '#4ade80' }} />
-                                                ) : (
-                                                    <ToggleLeft size={24} className="text-stone-600" />
-                                                )}
-                                            </button>
-                                            <button
-                                                onClick={() => openItemForm(cat.id, item)}
-                                                className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-stone-700 transition-all"
-                                                style={{ border: '1px solid rgba(255,255,255,0.08)' }}
-                                            >
-                                                <Pencil size={12} className="text-stone-400" />
-                                            </button>
-                                            <button
-                                                onClick={() => deleteItem(item.id)}
-                                                className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-red-900/30 transition-all"
-                                                style={{ border: '1px solid rgba(239,68,68,0.2)' }}
-                                            >
-                                                <Trash2 size={12} className="text-red-400" />
-                                            </button>
+
+                                            {/* Price */}
+                                            <span className="font-bold text-amber-500 text-sm whitespace-nowrap shrink-0">
+                                                ₹{item.price}
+                                            </span>
+
+                                            {/* Actions */}
+                                            <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+                                                <button
+                                                    onClick={() => toggleAvailability(item)}
+                                                    title={item.available ? 'Available' : 'Unavailable'}
+                                                    className="transition-all"
+                                                >
+                                                    {item.available
+                                                        ? <ToggleRight size={22} style={{ color: '#4ade80' }} />
+                                                        : <ToggleLeft size={22} className="text-stone-600" />
+                                                    }
+                                                </button>
+                                                <button
+                                                    onClick={() => openItemForm(cat.id, item)}
+                                                    className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-stone-700 transition-all"
+                                                    style={{ border: '1px solid rgba(255,255,255,0.08)' }}
+                                                >
+                                                    <Pencil size={11} className="text-stone-400" />
+                                                </button>
+                                                <button
+                                                    onClick={() => deleteItem(item.id)}
+                                                    className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-red-900/30 transition-all"
+                                                    style={{ border: '1px solid rgba(239,68,68,0.2)' }}
+                                                >
+                                                    <Trash2 size={11} className="text-red-400" />
+                                                </button>
+                                            </div>
                                         </div>
                                     ))}
+
                                     <div className="p-3">
                                         <button
                                             onClick={() => openItemForm(cat.id)}
@@ -287,32 +308,49 @@ export default function AdminMenuPage() {
                 </div>
             )}
 
-            {/* Category Modal — no emoji field */}
+            {/* ── Category Modal ── */}
             {showCatForm && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center px-4"
+                <div
+                    className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:px-4"
                     style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)' }}
                     onClick={() => setShowCatForm(false)}
                 >
-                    <div className="glass-card p-6 w-full max-w-md animate-scale-in"
-                        style={{ background: 'rgba(28,25,23,0.95)' }}
+                    <div
+                        className="glass-card p-5 sm:p-6 w-full sm:max-w-md animate-scale-in rounded-t-2xl sm:rounded-2xl"
+                        style={{ background: 'rgba(28,25,23,0.98)' }}
                         onClick={(e) => e.stopPropagation()}
                     >
-                        <div className="flex items-center justify-between mb-6">
-                            <h3 className="text-lg font-bold text-stone-100">
+                        {/* Drag handle (mobile) */}
+                        <div className="w-10 h-1 rounded-full bg-stone-700 mx-auto mb-4 sm:hidden" />
+
+                        <div className="flex items-center justify-between mb-5">
+                            <h3 className="text-base sm:text-lg font-bold text-stone-100">
                                 {editingCat ? 'Edit Category' : 'Add Category'}
                             </h3>
                             <button onClick={() => setShowCatForm(false)} className="text-stone-500 hover:text-stone-300">
                                 <X size={20} />
                             </button>
                         </div>
+
                         <div className="space-y-4">
                             <div>
                                 <label className="block text-xs font-medium text-stone-500 mb-1.5 uppercase tracking-wider">Category Name</label>
-                                <input value={catName} onChange={(e) => setCatName(e.target.value)} className="input-premium" placeholder="e.g. Hot Beverages" autoFocus />
+                                <input
+                                    value={catName}
+                                    onChange={(e) => setCatName(e.target.value)}
+                                    className="input-premium"
+                                    placeholder="e.g. Hot Beverages"
+                                    autoFocus
+                                />
                             </div>
                             <div>
                                 <label className="block text-xs font-medium text-stone-500 mb-1.5 uppercase tracking-wider">Sort Order</label>
-                                <input type="number" value={catOrder} onChange={(e) => setCatOrder(Number(e.target.value))} className="input-premium" />
+                                <input
+                                    type="number"
+                                    value={catOrder}
+                                    onChange={(e) => setCatOrder(Number(e.target.value))}
+                                    className="input-premium"
+                                />
                                 <p className="text-stone-600 text-xs mt-1">Lower numbers appear first</p>
                             </div>
                             <div className="flex gap-3 pt-2">
@@ -326,36 +364,61 @@ export default function AdminMenuPage() {
                 </div>
             )}
 
-            {/* Item Modal */}
+            {/* ── Item Modal ── */}
             {showItemForm && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center px-4"
+                <div
+                    className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:px-4"
                     style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)' }}
                     onClick={() => setShowItemForm(false)}
                 >
-                    <div className="glass-card p-6 w-full max-w-md animate-scale-in"
-                        style={{ background: 'rgba(28,25,23,0.95)' }}
+                    <div
+                        className="glass-card p-5 sm:p-6 w-full sm:max-w-md animate-scale-in rounded-t-2xl sm:rounded-2xl max-h-[90dvh] overflow-y-auto"
+                        style={{ background: 'rgba(28,25,23,0.98)' }}
                         onClick={(e) => e.stopPropagation()}
                     >
-                        <div className="flex items-center justify-between mb-6">
-                            <h3 className="text-lg font-bold text-stone-100">
+                        {/* Drag handle (mobile) */}
+                        <div className="w-10 h-1 rounded-full bg-stone-700 mx-auto mb-4 sm:hidden" />
+
+                        <div className="flex items-center justify-between mb-5">
+                            <h3 className="text-base sm:text-lg font-bold text-stone-100">
                                 {editingItem ? 'Edit Item' : 'Add Item'}
                             </h3>
                             <button onClick={() => setShowItemForm(false)} className="text-stone-500 hover:text-stone-300">
                                 <X size={20} />
                             </button>
                         </div>
+
                         <div className="space-y-4">
                             <div>
                                 <label className="block text-xs font-medium text-stone-500 mb-1.5 uppercase tracking-wider">Name</label>
-                                <input value={itemName} onChange={(e) => setItemName(e.target.value)} className="input-premium" placeholder="Item name" autoFocus />
+                                <input
+                                    value={itemName}
+                                    onChange={(e) => setItemName(e.target.value)}
+                                    className="input-premium"
+                                    placeholder="Item name"
+                                    autoFocus
+                                />
                             </div>
                             <div>
                                 <label className="block text-xs font-medium text-stone-500 mb-1.5 uppercase tracking-wider">Description</label>
-                                <textarea value={itemDesc} onChange={(e) => setItemDesc(e.target.value)} className="input-premium resize-none" rows={2} placeholder="Brief description" />
+                                <textarea
+                                    value={itemDesc}
+                                    onChange={(e) => setItemDesc(e.target.value)}
+                                    className="input-premium resize-none"
+                                    rows={2}
+                                    placeholder="Brief description"
+                                />
                             </div>
                             <div>
                                 <label className="block text-xs font-medium text-stone-500 mb-1.5 uppercase tracking-wider">Price (₹)</label>
-                                <input type="number" value={itemPrice} onChange={(e) => setItemPrice(e.target.value)} className="input-premium" placeholder="0" />
+                                <input
+                                    type="number"
+                                    inputMode="decimal"
+                                    value={itemPrice}
+                                    onChange={(e) => setItemPrice(e.target.value)}
+                                    className="input-premium"
+                                    placeholder="0"
+                                />
                             </div>
                             <div>
                                 <label className="block text-xs font-medium text-stone-500 mb-1.5 uppercase tracking-wider">Image</label>
