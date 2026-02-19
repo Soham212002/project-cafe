@@ -149,7 +149,7 @@ export default function MenuPage() {
                 boxShadow: '0 4px 15px rgba(245,158,11,0.3)',
               }}
             >
-              <ShoppingCart size={14} />
+              <ShoppingCart size={18} />
               <span>₹{getTotal().toFixed(0)}</span>
               {totalItems > 0 && (
                 <span className="absolute -top-2 -right-2 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold animate-bounce-in"
@@ -275,8 +275,8 @@ export default function MenuPage() {
               boxShadow: '0 8px 40px rgba(245,158,11,0.4)',
             }}
           >
-            <ShoppingCart size={22} />
-            View Cart ({totalItems}) — ₹{getTotal().toFixed(0)}
+            <ShoppingCart size={18} />
+            View Cart ({totalItems}) ₹{getTotal().toFixed(0)}
           </button>
         </div>
       )}
