@@ -30,25 +30,20 @@ export default function AdminCustomersPage() {
     useEffect(() => { fetchData() }, [])
 
     async function fetchData() {
-        const { data: profiles, error: profilesError } = await supabase
+        const { data: profileData, error: profilesError } = await supabase
             .from('profiles')
             .select('*')
             .order('created_at', { ascending: false })
 
         if (profilesError) {
             console.error('Profiles fetch error:', profilesError.message)
-            // Try without ordering by created_at
             const { data: fallback } = await supabase.from('profiles').select('*')
             if (fallback) setProfiles(fallback)
-        } else if (profiles) {
-            setProfiles(profiles)
+        } else if (profileData) {
+            setProfiles(profileData)
         }
 
-        // Get order summaries
-        const { data: orders } = await supabase
-            .from('orders')
-            .select('user_id, total')
-
+        const { data: orders } = await supabase.from('orders').select('user_id, total')
         if (orders) {
             const summaries: Record<string, OrderSummary> = {}
             orders.forEach((o: any) => {
@@ -65,10 +60,7 @@ export default function AdminCustomersPage() {
     }
 
     async function viewCustomerOrders(userId: string) {
-        if (expanded === userId) {
-            setExpanded(null)
-            return
-        }
+        if (expanded === userId) { setExpanded(null); return }
         const { data } = await supabase
             .from('orders')
             .select('id, order_number, status, total, created_at')
@@ -82,34 +74,39 @@ export default function AdminCustomersPage() {
     const filtered = profiles.filter(p => {
         if (!search) return true
         const q = search.toLowerCase()
-        return p.full_name?.toLowerCase().includes(q) ||
-            p.email?.toLowerCase().includes(q)
+        return p.full_name?.toLowerCase().includes(q) || p.email?.toLowerCase().includes(q)
     })
 
     return (
-        <div className="p-6">
-            <div className="mb-6 animate-fade-in-up">
-                <h1 className="text-2xl font-extrabold text-stone-100">Customers</h1>
-                <p className="text-stone-500 text-sm mt-1">{profiles.length} registered customers</p>
+        <div className="p-4 sm:p-6">
+            {/* Header */}
+            <div className="mb-5 sm:mb-6 animate-fade-in-up">
+                <h1 className="text-xl sm:text-2xl font-extrabold text-stone-100">Customers</h1>
+                <p className="text-stone-500 text-xs sm:text-sm mt-1">{profiles.length} registered customers</p>
             </div>
 
             {/* Search */}
-            <div className="relative mb-6 animate-fade-in-up" style={{ animationDelay: '0.05s' }}>
-                <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-500 z-10" />
+            <div className="relative mb-4 sm:mb-6 animate-fade-in-up" style={{ animationDelay: '0.05s' }}>
+                <Search size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-500 z-10" />
                 <input
                     type="text"
-                    placeholder="Search customers by name or email..."
+                    placeholder="Search by name or email..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     className="input-premium"
-                    style={{ paddingLeft: '44px' }}
+                    style={{ paddingLeft: '40px' }}
                 />
             </div>
 
             {loading ? (
-                <div className="space-y-3">{[...Array(5)].map((_, i) => <div key={i} className="h-20 shimmer" />)}</div>
+                <div className="space-y-3">
+                    {[...Array(5)].map((_, i) => <div key={i} className="h-16 sm:h-20 shimmer rounded-xl" />)}
+                </div>
             ) : filtered.length === 0 ? (
-                <div className="text-center py-20 text-stone-600"><p>No customers found</p></div>
+                <div className="text-center py-16 sm:py-20 text-stone-600">
+                    <User size={40} className="mx-auto mb-3 opacity-30" />
+                    <p className="text-sm">No customers found</p>
+                </div>
             ) : (
                 <div className="space-y-3 stagger-children">
                     {filtered.map((profile) => {
@@ -118,62 +115,103 @@ export default function AdminCustomersPage() {
 
                         return (
                             <div key={profile.id} className="glass-card overflow-hidden">
-                                <div className="flex items-center justify-between p-4 cursor-pointer"
+                                <div
+                                    className="flex items-center gap-3 p-3 sm:p-4 cursor-pointer"
                                     onClick={() => viewCustomerOrders(profile.id)}
                                 >
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-10 h-10 rounded-xl flex items-center justify-center"
-                                            style={{ background: 'linear-gradient(135deg, rgba(245,158,11,0.2), rgba(217,119,6,0.1))' }}
-                                        >
-                                            <User size={18} className="text-amber-500" />
-                                        </div>
-                                        <div>
-                                            <h3 className="font-semibold text-stone-100 text-sm">{profile.full_name || 'Unnamed'}</h3>
-                                            <div className="flex items-center gap-1 text-stone-500 text-xs">
-                                                <Mail size={10} />
-                                                {profile.email}
-                                            </div>
+                                    {/* Avatar */}
+                                    <div
+                                        className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shrink-0"
+                                        style={{ background: 'linear-gradient(135deg, rgba(245,158,11,0.2), rgba(217,119,6,0.1))' }}
+                                    >
+                                        <User size={16} className="text-amber-500" />
+                                    </div>
+
+                                    {/* Name + email */}
+                                    <div className="flex-1 min-w-0">
+                                        <h3 className="font-semibold text-stone-100 text-sm truncate">
+                                            {profile.full_name || 'Unnamed'}
+                                        </h3>
+                                        <div className="flex items-center gap-1 text-stone-500 text-xs">
+                                            <Mail size={10} className="shrink-0" />
+                                            <span className="truncate">{profile.email}</span>
                                         </div>
                                     </div>
-                                    <div className="flex items-center gap-6 text-right">
-                                        <div>
+
+                                    {/* Stats + role */}
+                                    <div className="flex items-center gap-3 sm:gap-6 shrink-0">
+                                        {/* Orders count — hidden on very small screens */}
+                                        <div className="text-right hidden xs:block">
                                             <p className="text-stone-300 font-bold text-sm">{summary?.order_count || 0}</p>
                                             <p className="text-stone-600 text-xs">Orders</p>
                                         </div>
-                                        <div>
+                                        {/* Spent — always visible */}
+                                        <div className="text-right">
                                             <p className="text-amber-500 font-bold text-sm">₹{(summary?.total_spent || 0).toFixed(0)}</p>
-                                            <p className="text-stone-600 text-xs">Spent</p>
+                                            <p className="text-stone-600 text-xs">
+                                                <span className="xs:hidden">{summary?.order_count || 0} orders</span>
+                                                <span className="hidden xs:inline">Spent</span>
+                                            </p>
                                         </div>
-                                        <span className="badge" style={{
-                                            background: profile.role === 'admin' ? 'rgba(245,158,11,0.15)' : 'rgba(255,255,255,0.05)',
-                                            color: profile.role === 'admin' ? '#fbbf24' : '#78716c',
-                                            border: profile.role === 'admin' ? '1px solid rgba(245,158,11,0.3)' : '1px solid rgba(255,255,255,0.08)',
-                                        }}>
+                                        {/* Role badge — hidden on small screens */}
+                                        <span
+                                            className="badge hidden sm:inline-flex"
+                                            style={{
+                                                background: profile.role === 'admin' ? 'rgba(245,158,11,0.15)' : 'rgba(255,255,255,0.05)',
+                                                color: profile.role === 'admin' ? '#fbbf24' : '#78716c',
+                                                border: profile.role === 'admin' ? '1px solid rgba(245,158,11,0.3)' : '1px solid rgba(255,255,255,0.08)',
+                                            }}
+                                        >
                                             {profile.role}
                                         </span>
                                     </div>
                                 </div>
 
+                                {/* Expanded: recent orders */}
                                 {isExpanded && (
-                                    <div className="px-4 pb-4 animate-fade-in-up" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-                                        <p className="text-stone-500 text-xs py-3 uppercase tracking-wider font-medium">Recent Orders</p>
+                                    <div
+                                        className="px-3 sm:px-4 pb-4 animate-fade-in-up"
+                                        style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}
+                                    >
+                                        {/* Role badge on mobile (shown in expanded only) */}
+                                        <div className="flex items-center justify-between pt-3 pb-2 sm:pt-0 sm:pb-0">
+                                            <p className="text-stone-500 text-xs sm:py-3 uppercase tracking-wider font-medium">Recent Orders</p>
+                                            <span
+                                                className="badge sm:hidden"
+                                                style={{
+                                                    background: profile.role === 'admin' ? 'rgba(245,158,11,0.15)' : 'rgba(255,255,255,0.05)',
+                                                    color: profile.role === 'admin' ? '#fbbf24' : '#78716c',
+                                                    border: profile.role === 'admin' ? '1px solid rgba(245,158,11,0.3)' : '1px solid rgba(255,255,255,0.08)',
+                                                }}
+                                            >
+                                                {profile.role}
+                                            </span>
+                                        </div>
+
                                         {customerOrders.length === 0 ? (
                                             <p className="text-stone-600 text-sm py-2">No orders yet</p>
                                         ) : (
-                                            <div className="space-y-2">
+                                            <div className="space-y-1">
                                                 {customerOrders.map((order: any) => (
-                                                    <div key={order.id} className="flex items-center justify-between py-2"
+                                                    <div
+                                                        key={order.id}
+                                                        className="flex items-center justify-between py-2"
                                                         style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}
                                                     >
-                                                        <div className="flex items-center gap-3">
-                                                            <ShoppingBag size={14} className="text-stone-600" />
-                                                            <span className="text-stone-300 text-sm font-medium">{order.order_number}</span>
-                                                            <span className={`badge badge-${order.status}`} style={{ fontSize: '10px', padding: '2px 6px' }}>
+                                                        <div className="flex items-center gap-2 min-w-0">
+                                                            <ShoppingBag size={13} className="text-stone-600 shrink-0" />
+                                                            <span className="text-stone-300 text-sm font-medium shrink-0">
+                                                                {order.order_number}
+                                                            </span>
+                                                            <span
+                                                                className={`badge badge-${order.status} shrink-0`}
+                                                                style={{ fontSize: '10px', padding: '2px 6px' }}
+                                                            >
                                                                 {order.status}
                                                             </span>
                                                         </div>
-                                                        <div className="flex items-center gap-4 text-xs">
-                                                            <span className="text-stone-500">
+                                                        <div className="flex items-center gap-3 text-xs shrink-0 ml-2">
+                                                            <span className="text-stone-500 hidden xs:inline">
                                                                 {new Date(order.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
                                                             </span>
                                                             <span className="text-amber-500 font-bold">₹{order.total?.toFixed(0)}</span>
@@ -182,8 +220,11 @@ export default function AdminCustomersPage() {
                                                 ))}
                                             </div>
                                         )}
+
                                         <p className="text-stone-600 text-xs mt-3">
-                                            Joined {new Date(profile.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
+                                            Joined {new Date(profile.created_at).toLocaleDateString('en-IN', {
+                                                day: 'numeric', month: 'long', year: 'numeric'
+                                            })}
                                         </p>
                                     </div>
                                 )}

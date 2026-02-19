@@ -107,32 +107,33 @@ export default function AdminOrdersPage() {
     }
 
     return (
-        <div className="p-6">
-            <div className="mb-6 animate-fade-in-up">
-                <h1 className="text-2xl font-extrabold text-stone-100">Orders</h1>
-                <p className="text-stone-500 text-sm mt-1">Manage and track all orders</p>
+        <div className="p-4 sm:p-6">
+            {/* Header */}
+            <div className="mb-5 sm:mb-6 animate-fade-in-up">
+                <h1 className="text-xl sm:text-2xl font-extrabold text-stone-100">Orders</h1>
+                <p className="text-stone-500 text-xs sm:text-sm mt-1">Manage and track all orders</p>
             </div>
 
             {/* Search */}
-            <div className="relative mb-6 animate-fade-in-up" style={{ animationDelay: '0.05s' }}>
-                <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-500 z-10" />
+            <div className="relative mb-4 sm:mb-6 animate-fade-in-up" style={{ animationDelay: '0.05s' }}>
+                <Search size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-500 z-10" />
                 <input
                     type="text"
-                    placeholder="Search by order number or customer..."
+                    placeholder="Search order or customer..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     className="input-premium"
-                    style={{ paddingLeft: '44px' }}
+                    style={{ paddingLeft: '40px' }}
                 />
             </div>
 
             {/* Filter Tabs */}
-            <div className="flex gap-2 mb-6 overflow-x-auto animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+            <div className="flex gap-2 mb-5 sm:mb-6 overflow-x-auto pb-1 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-none animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
                 {['all', 'pending', 'preparing', 'ready', 'served'].map((s) => (
                     <button
                         key={s}
                         onClick={() => setFilter(s)}
-                        className="px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all"
+                        className="px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-medium whitespace-nowrap transition-all shrink-0"
                         style={{
                             background: filter === s ? 'linear-gradient(135deg, #f59e0b, #d97706)' : 'rgba(255,255,255,0.05)',
                             color: filter === s ? '#0c0a09' : '#78716c',
@@ -140,16 +141,23 @@ export default function AdminOrdersPage() {
                         }}
                     >
                         {s.charAt(0).toUpperCase() + s.slice(1)}
-                        {s !== 'all' && <span className="ml-1.5 opacity-70">{stats[s as keyof typeof stats]}</span>}
+                        {s !== 'all' && (
+                            <span className="ml-1.5 opacity-70">{stats[s as keyof typeof stats]}</span>
+                        )}
                     </button>
                 ))}
             </div>
 
             {/* Orders */}
             {loading ? (
-                <div className="space-y-3">{[...Array(5)].map((_, i) => <div key={i} className="h-24 shimmer" />)}</div>
+                <div className="space-y-3">
+                    {[...Array(5)].map((_, i) => <div key={i} className="h-20 sm:h-24 shimmer rounded-xl" />)}
+                </div>
             ) : filtered.length === 0 ? (
-                <div className="text-center py-20 text-stone-600"><p>No orders found</p></div>
+                <div className="text-center py-16 sm:py-20 text-stone-600">
+                    <ShoppingBag size={40} className="mx-auto mb-3 opacity-30" />
+                    <p className="text-sm">No orders found</p>
+                </div>
             ) : (
                 <div className="space-y-3 stagger-children">
                     {filtered.map((order) => {
@@ -159,63 +167,85 @@ export default function AdminOrdersPage() {
 
                         return (
                             <div key={order.id} className="glass-card overflow-hidden">
-                                <div className="flex items-center justify-between p-4">
-                                    <div className="flex items-center gap-4 flex-1 min-w-0">
-                                        <div>
-                                            <p className="text-lg font-black text-stone-100">{order.order_number}</p>
-                                            <p className="text-xs text-stone-600">
-                                                {new Date(order.created_at).toLocaleString('en-IN', {
-                                                    day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
-                                                })}
+                                <div className="p-3 sm:p-4">
+                                    {/* Top row: order # + badge + price + actions */}
+                                    <div className="flex items-start justify-between gap-2 mb-1">
+                                        <div className="flex items-center gap-2 flex-wrap min-w-0">
+                                            <p className="text-base sm:text-lg font-black text-stone-100 shrink-0">
+                                                {order.order_number}
                                             </p>
+                                            <span className={`badge badge-${order.status} shrink-0`}>
+                                                <StatusIcon size={11} />
+                                                <span className="hidden xs:inline">{order.status}</span>
+                                            </span>
                                         </div>
-                                        <span className={`badge badge-${order.status}`}>
-                                            <StatusIcon size={12} />
-                                            {order.status}
-                                        </span>
-                                        <span className="text-stone-500 text-xs">Table {order.table_id}</span>
-                                        <span className="text-stone-400 text-xs hidden sm:inline truncate">
+
+                                        {/* Actions: always top-right */}
+                                        <div className="flex items-center gap-1.5 shrink-0">
+                                            <span className="font-bold text-amber-500 text-sm">
+                                                ₹{order.total?.toFixed(0)}
+                                            </span>
+                                            <button
+                                                onClick={() => setExpanded(isExpanded ? null : order.id)}
+                                                className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center hover:bg-stone-700 transition-all"
+                                                style={{ border: '1px solid rgba(255,255,255,0.08)' }}
+                                            >
+                                                <Eye size={13} className="text-stone-400" />
+                                            </button>
+                                            {nextStatus && (
+                                                <button
+                                                    onClick={() => updateStatus(order.id, order.status)}
+                                                    disabled={updating === order.id}
+                                                    className="btn-primary px-2.5 py-1.5 text-xs"
+                                                >
+                                                    {updating === order.id ? '...' : `→ ${nextStatus}`}
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {/* Meta row: table + customer + time */}
+                                    <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-stone-500">
+                                        <span>Table {order.table_id}</span>
+                                        <span className="truncate max-w-[140px] sm:max-w-none">
                                             {order.profiles?.full_name || order.profiles?.email || 'Guest'}
                                         </span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <span className="font-bold text-amber-500 text-sm">₹{order.total?.toFixed(0)}</span>
-                                        <button
-                                            onClick={() => setExpanded(isExpanded ? null : order.id)}
-                                            className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-stone-700 transition-all"
-                                            style={{ border: '1px solid rgba(255,255,255,0.08)' }}
-                                        >
-                                            <Eye size={14} className="text-stone-400" />
-                                        </button>
-                                        {nextStatus && (
-                                            <button
-                                                onClick={() => updateStatus(order.id, order.status)}
-                                                disabled={updating === order.id}
-                                                className="btn-primary px-3 py-1.5 text-xs"
-                                            >
-                                                {updating === order.id ? '...' : `→ ${nextStatus}`}
-                                            </button>
-                                        )}
+                                        <span className="ml-auto sm:ml-0">
+                                            {new Date(order.created_at).toLocaleString('en-IN', {
+                                                day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
+                                            })}
+                                        </span>
                                     </div>
                                 </div>
 
+                                {/* Expanded detail */}
                                 {isExpanded && (
-                                    <div className="px-4 pb-4 animate-fade-in-up" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-                                        <div className="pt-3 space-y-1">
+                                    <div
+                                        className="px-3 sm:px-4 pb-4 animate-fade-in-up"
+                                        style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}
+                                    >
+                                        <div className="pt-3 space-y-1.5">
                                             {order.order_items?.map((item, i) => (
                                                 <div key={i} className="flex justify-between text-sm">
-                                                    <span className="text-stone-400">{item.menu_items?.name} × {item.quantity}</span>
-                                                    <span className="text-stone-300">₹{(item.unit_price * item.quantity).toFixed(2)}</span>
+                                                    <span className="text-stone-400 truncate pr-4">
+                                                        {item.menu_items?.name} × {item.quantity}
+                                                    </span>
+                                                    <span className="text-stone-300 shrink-0">
+                                                        ₹{(item.unit_price * item.quantity).toFixed(2)}
+                                                    </span>
                                                 </div>
                                             ))}
                                         </div>
-                                        <div className="flex justify-between items-center mt-3 pt-3" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-                                            <span className="text-stone-500 text-xs">
-                                                Customer: {order.profiles?.full_name || order.profiles?.email || 'Guest'}
+                                        <div
+                                            className="flex justify-between items-center mt-3 pt-3"
+                                            style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}
+                                        >
+                                            <span className="text-stone-500 text-xs truncate pr-4">
+                                                {order.profiles?.full_name || order.profiles?.email || 'Guest'}
                                             </span>
                                             <button
                                                 onClick={() => deleteOrder(order.id)}
-                                                className="text-red-400 text-xs hover:text-red-300 font-medium"
+                                                className="text-red-400 text-xs hover:text-red-300 font-medium shrink-0"
                                             >
                                                 Delete Order
                                             </button>
