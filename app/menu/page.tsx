@@ -276,7 +276,7 @@ export default function MenuPage() {
             }}
           >
             <ShoppingCart size={18} />
-            View Cart ({totalItems}) ₹{getTotal().toFixed(0)}
+            View Cart
           </button>
         </div>
       )}
