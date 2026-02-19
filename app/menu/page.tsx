@@ -275,7 +275,7 @@ export default function MenuPage() {
               boxShadow: '0 8px 40px rgba(245,158,11,0.4)',
             }}
           >
-            <ShoppingCart size={18} />
+            <ShoppingCart size={16} />
             View Cart ({totalItems})
           </button>
         </div>
