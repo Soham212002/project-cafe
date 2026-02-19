@@ -276,7 +276,7 @@ export default function MenuPage() {
             }}
           >
             <ShoppingCart size={18} />
-            View Cart
+            View Cart ({totalItems})
           </button>
         </div>
       )}
