@@ -160,7 +160,7 @@ export default function LoginPage() {
                             <label className="block text-xs font-medium text-stone-500 mb-1.5 uppercase tracking-wider">Full Name</label>
                             <input
                                 type="text"
-                                placeholder="John Doe"
+                                placeholder="Enter Your Name"
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
                                 className="input-premium"
@@ -172,7 +172,7 @@ export default function LoginPage() {
                         <label className="block text-xs font-medium text-stone-500 mb-1.5 uppercase tracking-wider">Email</label>
                         <input
                             type="email"
-                            placeholder="you@example.com"
+                            placeholder="Enter your Email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             className="input-premium"
@@ -184,7 +184,7 @@ export default function LoginPage() {
                         <div className="relative">
                             <input
                                 type={showPassword ? 'text' : 'password'}
-                                placeholder="••••••••"
+                                placeholder="Your Password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 className="input-premium pr-11"
@@ -224,7 +224,6 @@ export default function LoginPage() {
                         ) : (
                             <>
                                 {isLogin ? 'Sign In' : 'Create Account'}
-                                <ArrowRight size={18} />
                             </>
                         )}
                     </button>
