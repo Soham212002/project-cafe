@@ -172,7 +172,8 @@ export default function MenuPage() {
                 placeholder="Search menu items..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="input-premium pl-10 pr-10"
+                className="input-premium"
+                style={{ paddingLeft: '40px', paddingRight: '40px' }}
                 autoFocus
               />
               {searchQuery && (
