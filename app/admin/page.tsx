@@ -115,7 +115,6 @@ export default function AdminPage() {
 
   return (
     <div className="p-4 sm:p-6">
-      {/* Header */}
       <div className="mb-6 sm:mb-8 animate-fade-in-up">
         <h1 className="text-xl sm:text-2xl font-extrabold text-stone-100">Dashboard</h1>
         <p className="text-stone-500 text-xs sm:text-sm mt-1">
@@ -125,9 +124,7 @@ export default function AdminPage() {
         </p>
       </div>
 
-      {/* Stats Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 mb-6 sm:mb-8 stagger-children">
-        {/* Revenue card — full width on mobile */}
         <div className="glass-card p-4 sm:p-5 col-span-2 sm:col-span-1">
           <div className="flex items-center gap-3 mb-3">
             <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: 'rgba(245,158,11,0.15)' }}>
@@ -163,7 +160,6 @@ export default function AdminPage() {
         ))}
       </div>
 
-      {/* Filter Tabs */}
       <div className="flex gap-2 mb-5 sm:mb-6 overflow-x-auto pb-1 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-none">
         {['all', 'pending', 'preparing', 'ready', 'served'].map((s) => (
           <button
@@ -186,7 +182,6 @@ export default function AdminPage() {
         ))}
       </div>
 
-      {/* Orders List */}
       {loading ? (
         <div className="space-y-4">
           {[...Array(4)].map((_, i) => (
@@ -207,7 +202,6 @@ export default function AdminPage() {
 
             return (
               <div key={order.id} className="glass-card p-4 sm:p-5">
-                {/* Top row: order number + badge + action */}
                 <div className="flex items-start justify-between gap-3 mb-3">
                   <div className="flex items-center gap-2 flex-wrap min-w-0">
                     <span className="text-lg sm:text-xl font-black text-stone-100 shrink-0">
@@ -223,7 +217,6 @@ export default function AdminPage() {
                     </span>
                   </div>
 
-                  {/* Action button — always visible top-right */}
                   <div className="shrink-0">
                     {!isLastStatus ? (
                       <button
@@ -239,7 +232,7 @@ export default function AdminPage() {
                                 Mark {nextStatus?.charAt(0).toUpperCase() + nextStatus?.slice(1)} →
                               </span>
                               <span className="sm:hidden">
-                                → {nextStatus?.charAt(0).toUpperCase() + nextStatus?.slice(1)}
+                                {nextStatus?.charAt(0).toUpperCase() + nextStatus?.slice(1)}
                               </span>
                             </>
                           )
@@ -255,7 +248,6 @@ export default function AdminPage() {
                   </div>
                 </div>
 
-                {/* Items */}
                 <div className="flex flex-wrap gap-1.5 mb-3">
                   {order.order_items?.map((item, i) => (
                     <span
@@ -268,7 +260,6 @@ export default function AdminPage() {
                   ))}
                 </div>
 
-                {/* Meta row */}
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-stone-600">
                   <span className="flex items-center gap-1">
                     <User size={11} />
