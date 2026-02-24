@@ -37,14 +37,13 @@ export async function POST(req: NextRequest) {
             }, { status: 401 })
         }
 
-        const { amount, currency = 'INR', receipt } = await req.json()
-
+        const { amount, currency = 'INR', receipt, notes } = await req.json()    
         const order = await razorpay.orders.create({
-            amount: amount * 100, // Razorpay expects amount in paise
+            amount: amount * 100,
             currency,
             receipt: receipt || `order_${Date.now()}`,
+            notes: notes || {},
         })
-
         // ✅ Return with success wrapper
         return NextResponse.json({ 
             success: true, 
