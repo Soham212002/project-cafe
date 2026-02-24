@@ -31,7 +31,10 @@ export async function POST(req: NextRequest) {
 
         const { data: { user } } = await supabase.auth.getUser()
         if (!user) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+            return NextResponse.json({ 
+                success: false, 
+                error: 'Unauthorized' 
+            }, { status: 401 })
         }
 
         const { amount, currency = 'INR', receipt } = await req.json()
@@ -42,11 +45,19 @@ export async function POST(req: NextRequest) {
             receipt: receipt || `order_${Date.now()}`,
         })
 
-        return NextResponse.json(order)
+        // ✅ Return with success wrapper
+        return NextResponse.json({ 
+            success: true, 
+            order: order 
+        })
+
     } catch (error) {
         console.error('Razorpay order creation error:', error)
         return NextResponse.json(
-            { error: 'Failed to create order' }, 
+            { 
+                success: false, 
+                error: 'Failed to create order' 
+            }, 
             { status: 500 }
         )
     }
