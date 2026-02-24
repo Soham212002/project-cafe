@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
 
         // Create Razorpay order
         const options = {
-            amount: Math.round(amount * 100), // Convert to paise
+            amount: Math.round(amount * 100), 
             currency,
             receipt: receipt || `order_${Date.now()}`,
             notes: notes || {},
