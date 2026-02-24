@@ -33,6 +33,14 @@ export default function LoginPage() {
             return
         }
 
+        // Check if email is confirmed
+        if (authData.user && !authData.user.email_confirmed_at) {
+            setError('Please verify your email before signing in. Check your inbox for the confirmation link.')
+            await supabase.auth.signOut()
+            setLoading(false)
+            return
+        }
+
         if (authData.user) {
             const { data: profile } = await supabase
                 .from('profiles')
@@ -64,22 +72,29 @@ export default function LoginPage() {
             return
         }
         if (data.user) {
-            await supabase.from('profiles').insert({
-                id: data.user.id,
-                email,
-                full_name: name,
-                role: 'customer'
-            })
+            // Only insert profile if user was actually created (identities array will be empty if user already exists)
+            if (data.user.identities && data.user.identities.length > 0) {
+                await supabase.from('profiles').insert({
+                    id: data.user.id,
+                    email,
+                    full_name: name,
+                    role: 'customer'
+                })
 
-            // Sign out immediately to prevent auto-login
-            await supabase.auth.signOut()
+                // Sign out immediately to prevent auto-login
+                await supabase.auth.signOut()
 
-            // Reset form and switch to login tab
-            setEmail('')
-            setPassword('')
-            setName('')
-            setIsLogin(true)
-            setSuccess('Account created successfully! Please sign in.')
+                // Reset form and switch to login tab
+                setEmail('')
+                setPassword('')
+                setName('')
+                setIsLogin(true)
+                setSuccess('Account created! Please check your email and click the confirmation link before signing in.')
+            } else {
+                // User already exists
+                setError('An account with this email already exists. Please sign in or use a different email.')
+                await supabase.auth.signOut()
+            }
         }
         setLoading(false)
     }
