@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
             razorpay_order_id,
             razorpay_payment_id,
             razorpay_signature,
-            order_data, // Contains: items, tableId, couponId, subtotal, discount, total
+            order_data, 
         } = body
 
         // Verify signature
