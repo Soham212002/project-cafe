@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { Coffee, Eye, EyeOff, ArrowRight, Sparkles } from 'lucide-react'
+import { Coffee, Eye, EyeOff, Sparkles } from 'lucide-react'
 import { useCafeSettings } from '@/hooks/useCafeSettings'
 
 export default function LoginPage() {
@@ -14,6 +14,7 @@ export default function LoginPage() {
     const [showPassword, setShowPassword] = useState(false)
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
+    const [success, setSuccess] = useState('')
     const router = useRouter()
     const supabase = createClient()
     const { settings } = useCafeSettings()
@@ -21,6 +22,7 @@ export default function LoginPage() {
     const handleLogin = async () => {
         setLoading(true)
         setError('')
+        setSuccess('')
         const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
             email,
             password
@@ -31,7 +33,6 @@ export default function LoginPage() {
             return
         }
 
-        // Check if user is admin
         if (authData.user) {
             const { data: profile } = await supabase
                 .from('profiles')
@@ -51,9 +52,11 @@ export default function LoginPage() {
     const handleRegister = async () => {
         setLoading(true)
         setError('')
+        setSuccess('')
         const { data, error } = await supabase.auth.signUp({
             email,
-            password
+            password,
+            options: { data: { full_name: name } }
         })
         if (error) {
             setError(error.message)
@@ -67,9 +70,24 @@ export default function LoginPage() {
                 full_name: name,
                 role: 'customer'
             })
-            router.push('/menu')
+
+            // Sign out immediately to prevent auto-login
+            await supabase.auth.signOut()
+
+            // Reset form and switch to login tab
+            setEmail('')
+            setPassword('')
+            setName('')
+            setIsLogin(true)
+            setSuccess('Account created successfully! Please sign in.')
         }
         setLoading(false)
+    }
+
+    const switchTab = (login: boolean) => {
+        setIsLogin(login)
+        setError('')
+        setSuccess('')
     }
 
     return (
@@ -132,7 +150,7 @@ export default function LoginPage() {
                     }}
                 >
                     <button
-                        onClick={() => { setIsLogin(true); setError('') }}
+                        onClick={() => switchTab(true)}
                         className="flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300"
                         style={{
                             background: isLogin ? 'linear-gradient(135deg, #f59e0b, #d97706)' : 'transparent',
@@ -142,7 +160,7 @@ export default function LoginPage() {
                         Sign In
                     </button>
                     <button
-                        onClick={() => { setIsLogin(false); setError('') }}
+                        onClick={() => switchTab(false)}
                         className="flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300"
                         style={{
                             background: !isLogin ? 'linear-gradient(135deg, #f59e0b, #d97706)' : 'transparent',
@@ -200,6 +218,19 @@ export default function LoginPage() {
                         </div>
                     </div>
 
+                    {/* Success */}
+                    {success && (
+                        <div className="animate-fade-in-up rounded-xl px-4 py-3 text-sm"
+                            style={{
+                                background: 'rgba(34, 197, 94, 0.1)',
+                                border: '1px solid rgba(34, 197, 94, 0.2)',
+                                color: '#86efac',
+                            }}
+                        >
+                            {success}
+                        </div>
+                    )}
+
                     {/* Error */}
                     {error && (
                         <div className="animate-fade-in-up rounded-xl px-4 py-3 text-sm"
@@ -222,9 +253,7 @@ export default function LoginPage() {
                         {loading ? (
                             <div className="w-5 h-5 border-2 border-stone-900/30 border-t-stone-900 rounded-full" style={{ animation: 'spin 0.6s linear infinite' }} />
                         ) : (
-                            <>
-                                {isLogin ? 'Sign In' : 'Create Account'}
-                            </>
+                            isLogin ? 'Sign In' : 'Create Account'
                         )}
                     </button>
                 </div>
@@ -233,7 +262,7 @@ export default function LoginPage() {
                 <p className="text-center text-stone-600 text-xs mt-6">
                     {isLogin ? "Don't have an account? " : 'Already have an account? '}
                     <button
-                        onClick={() => { setIsLogin(!isLogin); setError('') }}
+                        onClick={() => switchTab(!isLogin)}
                         className="text-amber-500 hover:text-amber-400 font-medium transition-colors"
                     >
                         {isLogin ? 'Register' : 'Sign In'}
